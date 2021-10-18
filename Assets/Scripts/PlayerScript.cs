@@ -6,20 +6,27 @@ using UnityEngine.UI;
 public class PlayerScript : MonoBehaviour
 {
     private Rigidbody2D rb2d;
-
     public float speed;
-
     public Text score;
-
     private int scoreValue = 0;
+    public bool grounded;
+
 
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
         score.text = scoreValue.ToString();
     }
-
-    // Update is called once per frame
+	private void Update()
+	{
+    if (Input.GetKeyDown(KeyCode.W))
+        {
+			if (grounded)
+			{
+                rb2d.AddForce(new Vector2(0, 10), ForceMode2D.Impulse);
+			}
+        }
+    }
     void FixedUpdate()
     {
         float hozMovement = Input.GetAxis("Horizontal");
@@ -38,14 +45,4 @@ public class PlayerScript : MonoBehaviour
 
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Ground")
-        {
-            if (Input.GetKey(KeyCode.W))
-            {
-                rb2d.AddForce(new Vector2(0, 3), ForceMode2D.Impulse);
-            }
-        }
-    }
 }
