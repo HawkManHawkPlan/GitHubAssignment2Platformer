@@ -2,15 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
     private Rigidbody2D rb2d;
-    public float speed;
+    public float speed, jumpForce;
     private float hozMovement;
     public Text score;
-    private int scoreValue = 0;
-    public bool grounded;
+    public TMP_Text lives, loss, winner;
+    private int scoreValue = 0, livesValue = 3;
+    public bool grounded, hasNotLost, hasWon, hasFinishedL1;
+    public GameObject theCamera;
 
     private Animator animator;
 
@@ -38,39 +41,63 @@ public class PlayerScript : MonoBehaviour
     private void Awake()
 	{
         animator = GetComponent<Animator>();
+        loss.enabled = false;
+        winner.enabled = false;
+        hasNotLost = true;
+        hasWon = false;
+        hasFinishedL1 = false;
 	}
 
 
 	void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        score.text = scoreValue.ToString();
+        score.text = "Coins: "+ scoreValue.ToString();
+        lives.text = "Lives: " + livesValue.ToString();
     }
 	private void Update()
 	{
-        hozMovement = Input.GetAxis("Horizontal");
-        if (!Input.anyKeyDown && hozMovement == 0)
-        {
-            animator.SetInteger("State", 0);
-        }
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-			if (grounded)
+		if (hasNotLost && hasWon == false)
+		{
+			if (!grounded)
 			{
-                rb2d.AddForce(new Vector2(0, 10), ForceMode2D.Impulse);
+                animator.Play("Jump");
 			}
-        }
-        if (hozMovement != 0)
-        {
-            animator.SetInteger("State", 1);
-            if (hozMovement > 0)
+            hozMovement = Input.GetAxis("Horizontal");
+            if (!Input.anyKeyDown && hozMovement == 0 && grounded)
             {
-                facingRightProp = true;
+                animator.Play("Idle");
             }
-            if (hozMovement < 0)
+            if (Input.GetKeyDown(KeyCode.W))
             {
-                facingRightProp = false;
+			    if (grounded)
+			    {
+                    rb2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+			    }
             }
+            if (hozMovement != 0)
+            {
+				if (grounded)
+				{
+                    animator.Play("Walk");
+				}
+                if (hozMovement > 0)
+                {
+                    facingRightProp = true;
+                }
+                if (hozMovement < 0)
+                {
+                    facingRightProp = false;
+                }
+            }
+		}
+        if(hasNotLost == false)
+		{
+            loss.enabled = true;
+		}
+        if(hasWon)
+		{
+            winner.enabled = true;
         }
     }
     void FixedUpdate()
@@ -83,9 +110,32 @@ public class PlayerScript : MonoBehaviour
         if (collision.GetComponent<BoxCollider2D>().tag == "Coin")
         {
             scoreValue += 1;
-            score.text = scoreValue.ToString();
-            Destroy(collision.gameObject);
+            score.text = "Coins: " + scoreValue.ToString();
+            if(scoreValue == 4)
+			{
+                gameObject.transform.position = new Vector3(230, 1, 0);
+                livesValue = 3;
+                lives.text = "Lives: " + livesValue.ToString();
+            }
+            if(scoreValue == 20)
+			{
+                hasWon = true;
+                gameObject.GetComponent<AudioSource>().Play();
+
+            }
         }
+        if (collision.GetComponent<BoxCollider2D>().tag == "Enemy")
+		{
+            livesValue -= 1;
+            lives.text = "Lives: " + livesValue.ToString();
+            if(livesValue == 0 && hasWon ==false)
+			{
+                hasNotLost = false;
+                hozMovement = 0;
+			}
+        }
+        Destroy(collision.gameObject);
+
     }
 
 }
