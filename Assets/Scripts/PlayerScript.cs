@@ -13,7 +13,6 @@ public class PlayerScript : MonoBehaviour
     public bool grounded;
 
     private Animator animator;
-    public int animState = 0;
 
     private bool facingRightField = true;
     public bool facingRightProp
@@ -50,6 +49,10 @@ public class PlayerScript : MonoBehaviour
 	private void Update()
 	{
         hozMovement = Input.GetAxis("Horizontal");
+        if (!Input.anyKeyDown && hozMovement == 0)
+        {
+            animator.SetInteger("State", 0);
+        }
         if (Input.GetKeyDown(KeyCode.W))
         {
 			if (grounded)
@@ -59,6 +62,7 @@ public class PlayerScript : MonoBehaviour
         }
         if (hozMovement != 0)
         {
+            animator.SetInteger("State", 1);
             if (hozMovement > 0)
             {
                 facingRightProp = true;
