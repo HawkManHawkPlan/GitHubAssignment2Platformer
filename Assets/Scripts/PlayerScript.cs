@@ -34,13 +34,13 @@ public class PlayerScript : MonoBehaviour
         rb2d.AddForce(new Vector2(hozMovement * speed, vertMovement * speed));
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Coin")
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+        if (collision.GetComponent<BoxCollider2D>().tag == "Coin")
         {
             scoreValue += 1;
             score.text = scoreValue.ToString();
-            Destroy(collision.collider.gameObject);
+            Destroy(collision.gameObject);
         }
 
     }
