@@ -113,11 +113,11 @@ public class PlayerScript : MonoBehaviour
             score.text = "Coins: " + scoreValue.ToString();
             if(scoreValue == 4)
 			{
-                gameObject.transform.position = new Vector3(230, 1, 0);
+                gameObject.transform.position = new Vector3(-230, 1, 0);
                 livesValue = 3;
                 lives.text = "Lives: " + livesValue.ToString();
             }
-            if(scoreValue == 20)
+            if(scoreValue == 10)
 			{
                 hasWon = true;
                 gameObject.GetComponent<AudioSource>().Play();
